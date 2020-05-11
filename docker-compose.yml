@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web:
+    image: rcmaddali/nodesample:0.0.2
+    ports:
+      - "3005:3005"
+    depends_on:
+     - mongo
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    volumes:
+      - /tmp/data:/data
+

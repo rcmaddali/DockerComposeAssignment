@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans">
+    <link href="style.css" rel="stylesheet"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.2/angular.min.js"></script>
+    <script>
+        var app = angular
+            .module("myApp", []);
+
+        app.controller("admincontroller", function admincontroller($scope, $http) {
+            $scope.temp = [];
+            var id = sessionStorage.getItem("user_id");
+            var init = function (id) {
+                $scope.usersList = $http.get("/api/listcontacts/" + id).then(function (response) {
+                    for (var i = 0; i < response.data.length; i++) {
+                        console.log(response.data[i])
+                        $scope.temp.push(response.data[i]);
+
+                    }
+                });
+            };
+            init(id);
+            $scope.deletecontact = function (u) {
+                console.log(u);
+                $scope.usersList = $http.delete("/api/deletecontact/" + u._id).then(function (response) {
+                    console.log(response.data);
+                    if (response.data.deletedCount == 1) {
+                        alert("Deleted " + u.first_name + " Successfully");
+                        window.location.reload(true);
+                    }
+                });
+            };
+
+            $scope.updatecontact = function (u) {
+                console.log(u);
+                var contact_id = sessionStorage.setItem("contact_id", u._id);
+                window.location = "updatecontact.html";
+                
+            }
+        });
+    </script>
+</head>
+
+<body ng-app="myApp">
+    <div ng-controller="admincontroller" style="text-align: center;" class="login-form">
+        <div class="topnav" ng-init="load()">
+            <a class = "active" href="contactcreate.html">Create a New Contact</a>
+            <a href ="index.html">Log Out</a>
+        </div>
+        <h1 class = "pageheader">DASHBOARD</h1>
+        <div id = "table">
+            <table style="text-align: center;" class = "table">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone</th>
+                    <th>Manage</th>
+                </tr>
+                <tr ng-repeat="x in temp">
+                    <td>{{x.first_name}}</td>
+                    <td>{{x.last_name}}</td>
+                    <td> {{x.phone}} </td>
+                    <td>
+                        <div>
+                            <button ng-click = "updatecontact(x)">Update</button>
+                            <button ng-click="deletecontact(x)">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <p id="temp"></p>
+    </div>
+    <br>
+    </div>
+</body>
+
+</html>
